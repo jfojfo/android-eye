@@ -62,7 +62,7 @@ public class MainActivity extends Activity
     implements View.OnTouchListener, CameraView.CameraReadyCallback, OverlayView.UpdateDoneCallback{
     private static final String TAG = "TEAONLY";
 
-    private AdView adView;
+//    private AdView adView;
 
     boolean inProcessing = false;
     final int maxVideoNumber = 3;
@@ -91,10 +91,10 @@ public class MainActivity extends Activity
         setContentView(R.layout.main);
 
         //setup adView
-        LinearLayout layout = (LinearLayout)findViewById(R.id.layout_setup);
-        adView = new AdView(this, AdSize.BANNER, "a1507f940fc****");
-        layout.addView(adView);
-        adView.loadAd(new AdRequest());
+//        LinearLayout layout = (LinearLayout)findViewById(R.id.layout_setup);
+//        adView = new AdView(this, AdSize.BANNER, "a1507f940fc****");
+//        layout.addView(adView);
+//        adView.loadAd(new AdRequest());
 
         btnExit = (Button)findViewById(R.id.btn_exit);
         btnExit.setOnClickListener(exitAction);
@@ -263,7 +263,11 @@ public class MainActivity extends Activity
                 int picWidth = cameraView_.Width();
                 int picHeight = cameraView_.Height(); 
                 ByteBuffer bbuffer = ByteBuffer.wrap(frame); 
-                bbuffer.get(preFrame, 0, picWidth*picHeight + picWidth*picHeight/2);
+                try {
+                    bbuffer.get(preFrame, 0, picWidth*picHeight + picWidth*picHeight/2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
                 inProcessing = false;
             }

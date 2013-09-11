@@ -88,7 +88,16 @@ public class CameraView implements SurfaceHolder.Callback{
     private void setupCamera() {
         camera_ = Camera.open();
         procSize_ = camera_.new Size(0, 0);
-        Camera.Parameters p = camera_.getParameters();        
+        Camera.Parameters p = camera_.getParameters();
+        List<Integer> formats = p.getSupportedPreviewFormats();
+        for (int i = 0; i < formats.size(); i++) {
+            int f = formats.get(i);
+            Log.d("TEAONLY", "format:" + f);
+        }
+        List<String> focusModes = p.getSupportedFocusModes();
+        for (int i = 0; i < focusModes.size(); i++) {
+            Log.d("TEAONLY", "focusModes:" + focusModes.get(i));
+        }
        
         supportedSizes = p.getSupportedPreviewSizes();
         procSize_ = supportedSizes.get( supportedSizes.size()/2 );

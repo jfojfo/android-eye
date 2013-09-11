@@ -18,10 +18,32 @@ function CameraSize () {
 var supportedSize = new Array();
 var currentSize = new CameraSize();
 
+var imageDelay = 30;
+var timer = null;
+var TIMEOUT = 5000;
+
 //////////////////////////////////////////////
 // Global function define
 //////////////////////////////////////////////
+var onImageLoadResult = function(loaded, total, success) {
+    if (timer != null) {
+        clearTimeout(timer);
+        timer = null;
+    }
+    console.log("result for ", this.src);
+    var num = picCount.toString();
+    if (this.src.match(num+"$")!=num) {
+        console.log("=====>already timeout: " + this.src);
+        return;
+    }
+    if (success) {
+        onImageLoadOK();
+    } else {
+        onImageLoadError();
+    }
+};
 var onImageLoadOK = function() {
+    console.log("img load ok");
     var wid = 0;
     var hei = 0;
     if ( planeHeight * currentSize.width / currentSize.height > planeWidth) {
@@ -34,11 +56,19 @@ var onImageLoadOK = function() {
     $("#live_image").width(wid);
     $("#live_image").height(hei);
 
+    var newDelay = imageDelay / 2;
+    if (newDelay >= 30)
+        imageDelay = newDelay;
     if ( inStreaming == true)
-        setTimeout(refreshLive, 300);  
+        setTimeout(refreshLive, imageDelay);  
 };
 
 var onImageLoadError = function() {
+    console.log("img load error");
+    var newDelay = imageDelay * 2;
+    if (newDelay > 1000)
+        return;
+    imageDelay = newDelay;
 };
 
 var onQueryDone = function (ret) {
@@ -71,6 +101,8 @@ var onQueryDone = function (ret) {
     $("#resolution-choice").bind("change", doChangeRes);  
 
     $("#debug_msg").html("Connected");
+
+    changeImageWH(currentSize.width, currentSize.height);
 };
 
 var onHttpError = function () {
@@ -78,10 +110,21 @@ var onHttpError = function () {
     $("#btn_play").button('disable'); 
 };
 
+function getFunc(f, arg) {
+    return function() {
+        return f(arg);
+    }
+}
 var refreshLive = function() {
     picCount = picCount + 1;
     $("#live_image").attr("src", basicURL + "stream/live.jpg?id=" + picCount);
-    $("#live_image").waitForImages( onImageLoadOK );
+    $("#video_plane").waitForImages(null, onImageLoadResult );
+    timer = setTimeout(getFunc(function(picId){
+        console.log("====>timeout: " + picId);
+        if ( inStreaming == true)
+            refreshLive();  
+    }, picCount), TIMEOUT);
+    console.log("picCount:" + picCount + ", delay:" + imageDelay);
 };
 
 var playClick = function () {
@@ -113,10 +156,21 @@ var onSetupOK = function() {
     currentSize = supportedSize[targetIndex]; 
 };
 
+function changeImageWH(width, height) {
+    planeHeight = height;
+    planeWidth = width;
+    $("#video_plane").width(planeWidth);
+    $("#video_plane").height(planeHeight);
+    $("#live_image").width(planeWidth);
+    $("#live_image").height(planeHeight);
+    $("#player").width(planeWidth);
+    //$("#player").height(hei);
+}
 var doChangeRes = function () {
     var targetIndex = $("#resolution-choice").val();
     var wid = supportedSize[targetIndex].width;
     var hei = supportedSize[targetIndex].height; 
+    changeImageWH(wid, hei);
     $.ajax({
         type: "GET",
         url: basicURL + "cgi/setup",

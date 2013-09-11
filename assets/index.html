@@ -24,14 +24,17 @@
     <div data-role="content">
         <ul data-role="listview" data-inset="true" >
             <li>
+            <!--div style="width:60%; float:left; display: inline-block"-->
                 <div class="live_image_box" id="video_plane">
                     <img id="live_image" src="images/black.png">
                 </div>
                 <div>
-                    <div id="player" style="display:block;height:32px;"></div>   
+                    <div id="player" class="center" style="display:block;height:32px;"></div>   
                 </div>    
+            <!--/div-->
             </li>
             <li data-role="fieldcontain" class="center">
+            <!--div style="width:30%; display: inline-block" data-role="fieldcontain" class="center"-->
                 <div class="center">
                     <span>Video size:</span>
                     <select name="resolution-choice" id="resolution-choice" data-native-menu="false">
@@ -40,6 +43,7 @@
                     <label for="checkbox-audio">Enable Audio</label>
                     <input id="btn_play" type="button" value="Play Video"/>
                 </div>
+            <!--/div-->
             </li>
         </ul>
         <!-- for debug -->
