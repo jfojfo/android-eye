@@ -130,6 +130,11 @@ public class MainActivity extends Activity
     @Override
     public void onDestroy(){
         super.onDestroy();
+        inProcessing = true;
+        if ( webServer != null)
+            webServer.stop();
+        audioLoop.ReleaseLoop();
+        audioCapture.release();
     }   
 
     @Override
@@ -145,16 +150,16 @@ public class MainActivity extends Activity
     @Override
     public void onPause(){  
         super.onPause();
-        inProcessing = true;
-        if ( webServer != null)
-            webServer.stop();
-        cameraView_.StopPreview(); 
-        //cameraView_.Release();
-        audioLoop.ReleaseLoop();
-        audioCapture.release();
-    
-        //System.exit(0);
-        finish();
+//        inProcessing = true;
+//        if ( webServer != null)
+//            webServer.stop();
+//        cameraView_.StopPreview(); 
+//        //cameraView_.Release();
+//        audioLoop.ReleaseLoop();
+//        audioCapture.release();
+//    
+//        //System.exit(0);
+//        finish();
     }  
     
     @Override
@@ -251,7 +256,8 @@ public class MainActivity extends Activity
     private OnClickListener exitAction = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            onPause();
+            // onPause();
+            finish();
         }   
     };
    
