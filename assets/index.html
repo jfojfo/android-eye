@@ -9,6 +9,7 @@
     <script src="res/jquery-1.7.1.min.js"></script>
     <script src="res/jquery.mobile-1.1.1.min.js"></script>
     <script src="res/jquery.waitforimages.min.js"></script>
+    <script src="res/jQueryRotateCompressed.js"></script>
     <script src="flowplayer-3.2.11.min.js"></script>
     <script src="droideye.js"></script>
 </head> 
@@ -41,6 +42,12 @@
                     </select>
                     <input type="checkbox" id="checkbox-audio" class="custom" />
                     <label for="checkbox-audio">Enable Audio</label>
+                    <div data-role="controlgroup" data-type="horizontal">
+                        <input id="rotate0" type="button" value="rotate 0"/>
+                        <input id="rotate90" type="button" value="rotate 90"/>
+                        <input id="rotate180" type="button" value="rotate 180"/>
+                        <input id="rotate270" type="button" value="rotate 270"/>
+                    </div>
                     <input id="btn_play" type="button" value="Play Video"/>
                 </div>
             <!--/div-->

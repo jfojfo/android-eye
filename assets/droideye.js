@@ -44,17 +44,17 @@ var onImageLoadResult = function(loaded, total, success) {
 };
 var onImageLoadOK = function() {
     console.log("img load ok");
-    var wid = 0;
-    var hei = 0;
-    if ( planeHeight * currentSize.width / currentSize.height > planeWidth) {
-        wid = planeWidth;
-        hei = math.round(planeWidth * currentSize.height / currentSize.width); 
-    } else {
-        hei = planeHeight;
-        wid = planeHeight * currentSize.width / currentSize.height;  
-    }
-    $("#live_image").width(wid);
-    $("#live_image").height(hei);
+//    var wid = 0;
+//    var hei = 0;
+//    if ( planeHeight * currentSize.width / currentSize.height > planeWidth) {
+//        wid = planeWidth;
+//        hei = math.round(planeWidth * currentSize.height / currentSize.width); 
+//    } else {
+//        hei = planeHeight;
+//        wid = planeHeight * currentSize.width / currentSize.height;  
+//    }
+//    $("#live_image").width(wid);
+//    $("#live_image").height(hei);
 
     var newDelay = imageDelay / 2;
     if (newDelay >= 30)
@@ -152,24 +152,25 @@ var playClick = function () {
 };
 
 var onSetupOK = function() {
-    var targetIndex = $("#resolution-choice").val();
-    currentSize = supportedSize[targetIndex]; 
+//    var targetIndex = $("#resolution-choice").val();
+//    currentSize = supportedSize[targetIndex]; 
 };
 
 function changeImageWH(width, height) {
     planeHeight = height;
     planeWidth = width;
-    $("#video_plane").width(planeWidth);
-    $("#video_plane").height(planeHeight);
+//    $("#video_plane").width(planeWidth);
+//    $("#video_plane").height(planeHeight);
     $("#live_image").width(planeWidth);
     $("#live_image").height(planeHeight);
-    $("#player").width(planeWidth);
+//    $("#player").width(planeWidth);
     //$("#player").height(hei);
 }
 var doChangeRes = function () {
     var targetIndex = $("#resolution-choice").val();
     var wid = supportedSize[targetIndex].width;
     var hei = supportedSize[targetIndex].height; 
+    currentSize = supportedSize[targetIndex]; 
     changeImageWH(wid, hei);
     $.ajax({
         type: "GET",
@@ -210,11 +211,15 @@ $("#page_main").live("pageinit", function() {
     planeHeight = Math.round( screenHeight * 0.5);
     planeWidth = Math.round( screenWidth * 0.80);
 
-    $("#video_plane").height(planeHeight);
-    $("#video_plane").width(planeWidth);
+//    $("#video_plane").height(planeHeight);
+//    $("#video_plane").width(planeWidth);
 
     $("#btn_play").button('disable');
     $("#btn_play").bind("click", playClick);
+    $("#rotate0").bind("click", function(){rotate(0);});
+    $("#rotate90").bind("click", function(){rotate(90);});
+    $("#rotate180").bind("click", function(){rotate(180);});
+    $("#rotate270").bind("click", function(){rotate(270);});
     
     initAudioPlayer();
 
@@ -226,6 +231,36 @@ $("#page_main").live("pageinit", function() {
         success: onQueryDone
     });
 });
+
+function rotate(degree) {
+    var r = "rotate(" + degree + "deg)";
+    var css = {"-webkit-transform":r,
+        "-moz-transform":r,
+        "-o-transform":r,
+        "-ms-transform":r,
+        "transform":r};
+//    $("#live_image").css(css);
+
+//        changeImageWH(planeHeight, planeWidth);
+//        $("#live_image").width(planeHeight);
+//        $("#live_image").height(planeWidth);
+
+    $("#live_image").rotate(degree);
+//    if (degree == 90 || degree == 270)
+//        $("#video_plane").height(planeWidth);
+//    else
+//        $("#video_plane").height(planeHeight);
+
+    $.ajax({
+        type: "GET",
+        url: basicURL + "cgi/rotate",
+        cache: false,
+        data: "degree=" + degree,
+        success: function(){
+            console.log("successfully rotate " + degree);
+        }
+    });
+}
 
 //////////////////////////////////////////////
 // Top level code define

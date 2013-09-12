@@ -67,6 +67,10 @@ public class CameraView implements SurfaceHolder.Callback{
     public void AutoFocus() {
         camera_.autoFocus(afcb);
     }
+    
+    public void Rotate(int degree) {
+        camera_.setDisplayOrientation(degree);
+    }
 
     public void Release() {
         if ( camera_ != null) {
@@ -119,15 +123,18 @@ public class CameraView implements SurfaceHolder.Callback{
     private Camera.AutoFocusCallback afcb = new Camera.AutoFocusCallback() {
         @Override
         public void onAutoFocus(boolean success, Camera camera) {
+            Log.d(TAG, "auto focus");
         }
     };
 
     @Override
     public void surfaceChanged(SurfaceHolder sh, int format, int w, int h){
+        Log.d(TAG, "surfaceChanged:" + w + ", " + h);
     }
     
 	@Override
-    public void surfaceCreated(SurfaceHolder sh){        
+    public void surfaceCreated(SurfaceHolder sh){
+	    Log.d(TAG, "surfaceCreated");
         setupCamera();        
         if ( cameraReadyCb_ != null)
             cameraReadyCb_.onCameraReady();
@@ -135,7 +142,7 @@ public class CameraView implements SurfaceHolder.Callback{
     
 	@Override
     public void surfaceDestroyed(SurfaceHolder sh){
-	    Log.d(TAG, "surface destroyed.");
+	    Log.d(TAG, "surfaceDestroyed");
         Release();
     }
 }

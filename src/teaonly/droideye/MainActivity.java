@@ -234,6 +234,7 @@ public class MainActivity extends Activity
                 webServer.registerCGI("/cgi/setup", doSetup);
                 webServer.registerCGI("/stream/live.jpg", doCapture);
                 webServer.registerCGI("/stream/live.mp3", doBroadcast);
+                webServer.registerCGI("/cgi/rotate", doRotate);
             }catch (IOException e){
                 webServer = null;
             }
@@ -305,7 +306,7 @@ public class MainActivity extends Activity
         public String run(Properties parms) {
             int wid = Integer.parseInt(parms.getProperty("wid")); 
             int hei = Integer.parseInt(parms.getProperty("hei"));
-            Log.d("TEAONLY", ">>>>>>>run in doSetup wid = " + wid + " hei=" + hei);
+            Log.d(TAG, ">>>>>>>run in doSetup wid = " + wid + " hei=" + hei);
             cameraView_.StopPreview();
             cameraView_.setupCamera(wid, hei, previewCb_);
             cameraView_.StartPreview();
@@ -366,7 +367,7 @@ public class MainActivity extends Activity
             }
             // return 503 internal error
             if ( targetFrame == null) {
-                Log.d("TEAONLY", "No free videoFrame found!");
+                Log.d(TAG, "No free videoFrame found!");
                 return null;
             }
 
@@ -396,6 +397,25 @@ public class MainActivity extends Activity
             return null;
         }
     }; 
+
+    private TeaServer.CommonGatewayInterface doRotate = new TeaServer.CommonGatewayInterface () {
+        @Override
+        public String run(Properties parms) {
+            int degree = Integer.parseInt(parms.getProperty("degree")); 
+            Log.d(TAG, ">>>>>>>run in doRotate degree = " + degree);
+            cameraView_.StopPreview();
+            cameraView_.Rotate(degree);
+            cameraView_.setupCamera(cameraView_.Width(), cameraView_.Height(), previewCb_);
+            cameraView_.StartPreview();
+            return "OK";
+        }   
+ 
+        @Override 
+        public InputStream streaming(Properties parms) {
+            return null;
+        }    
+    }; 
+
 
     static private native int nativeOpenEncoder();
     static private native void nativeCloseEncoder();
