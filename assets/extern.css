@@ -19,3 +19,6 @@ div.center {
     margin:auto 0; 
 }
 
+.ui-field-contain .ui-controlgroup-controls {
+    width:100%;
+}

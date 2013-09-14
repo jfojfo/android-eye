@@ -71,9 +71,11 @@ var onImageLoadError = function() {
     imageDelay = newDelay;
 };
 
-var onQueryDone = function (ret) {
+var onQueryDone = function (json) {
     $("#btn_play").button('enable');
     
+    var jsonObj = $.evalJSON(json);
+    var ret = jsonObj.camsize;
     $("#resolution-choice").empty();
     var resList = ret.split("|");
     currentSize.width = resList[0].split("x")[0];
@@ -103,6 +105,9 @@ var onQueryDone = function (ret) {
     $("#debug_msg").html("Connected");
 
     changeImageWH(currentSize.width, currentSize.height);
+
+    var quality = jsonObj.quality;
+    changeQuality(quality);
 };
 
 var onHttpError = function () {
@@ -203,7 +208,7 @@ var initAudioPlayer = function () {
     audioPlayer = $f();
 };
 
-$("#page_main").live("pageinit", function() {
+$(document).on("pageinit", "#page_main", function() {
     basicURL = $(location).attr('href');
         
     var screenHeight = $(window).height();
@@ -220,6 +225,8 @@ $("#page_main").live("pageinit", function() {
     $("#rotate90").bind("click", function(){rotate(90);});
     $("#rotate180").bind("click", function(){rotate(180);});
     $("#rotate270").bind("click", function(){rotate(270);});
+    $("#btn_autofocus").bind("click", autoFocus);
+    $("#slider").on("slidestop", changeQuality);
     
     initAudioPlayer();
 
@@ -261,6 +268,33 @@ function rotate(degree) {
         }
     });
 }
+
+function autoFocus() {
+    $.ajax({
+        type: "GET",
+        url: basicURL + "cgi/autofocus",
+        cache: false,
+        success: function(){
+            console.log("successfully auto focus");
+        }
+    });
+}
+
+function changeQuality(e) {
+    var quality = $(e.target).val();
+    if (!quality) return;
+    console.log("change quality:", quality);
+    $.ajax({
+        type: "GET",
+        url: basicURL + "cgi/changequality",
+        cache: false,
+        data: "quality=" + quality,
+        success: function(){
+            console.log("successfully changed quality to " + quality);
+        }
+    });
+}
+
 
 //////////////////////////////////////////////
 // Top level code define

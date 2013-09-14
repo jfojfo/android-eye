@@ -14,6 +14,8 @@ import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import  org.apache.http.conn.util.InetAddressUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -75,6 +77,7 @@ public class MainActivity extends Activity
     private Button btnExit;
     private TextView tvMessage1;
     private TextView tvMessage2;
+    private int mQuality = 30;
 
     private AudioRecord audioCapture = null;
     private StreamingLoop audioLoop = null;
@@ -235,6 +238,8 @@ public class MainActivity extends Activity
                 webServer.registerCGI("/stream/live.jpg", doCapture);
                 webServer.registerCGI("/stream/live.mp3", doBroadcast);
                 webServer.registerCGI("/cgi/rotate", doRotate);
+                webServer.registerCGI("/cgi/autofocus", doAutoFocus);
+                webServer.registerCGI("/cgi/changequality", doChangeQuality);
             }catch (IOException e){
                 webServer = null;
             }
@@ -292,7 +297,14 @@ public class MainActivity extends Activity
             }
             int i = supportSize.size() - 1;
             ret = ret + "" + supportSize.get(i).width + "x" + supportSize.get(i).height ;
-            return ret;
+            JSONObject obj = new JSONObject();
+            try {
+                obj.put("camsize", ret);
+                obj.put("quality", mQuality);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return obj.toString();
         }
         
         @Override 
@@ -379,7 +391,7 @@ public class MainActivity extends Activity
             boolean ret;
             inProcessing = true;
             try{
-                ret = newImage.compressToJpeg( new Rect(0,0,picWidth,picHeight), 30, targetFrame);
+                ret = newImage.compressToJpeg( new Rect(0,0,picWidth,picHeight), mQuality, targetFrame);
             } catch (Exception ex) {
                 ret = false;    
             } 
@@ -408,6 +420,40 @@ public class MainActivity extends Activity
             cameraView_.setupCamera(cameraView_.Width(), cameraView_.Height(), previewCb_);
             cameraView_.StartPreview();
             return "OK";
+        }   
+ 
+        @Override 
+        public InputStream streaming(Properties parms) {
+            return null;
+        }    
+    }; 
+
+    private TeaServer.CommonGatewayInterface doAutoFocus = new TeaServer.CommonGatewayInterface () {
+        @Override
+        public String run(Properties parms) {
+            Log.d(TAG, ">>>>>>>run in doAutoFocus");
+            cameraView_.AutoFocus();
+            return "OK";
+        }   
+
+        @Override 
+        public InputStream streaming(Properties parms) {
+            return null;
+        }    
+    }; 
+
+    private TeaServer.CommonGatewayInterface doChangeQuality = new TeaServer.CommonGatewayInterface () {
+        @Override
+        public String run(Properties parms) {
+            try {
+                int quality = Integer.parseInt(parms.getProperty("quality")); 
+                Log.d(TAG, ">>>>>>>run in doChangeQuality quality = " + quality);
+                mQuality = quality;
+                return "OK";
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return "ERROR";
         }   
  
         @Override 
