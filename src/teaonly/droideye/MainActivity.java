@@ -36,11 +36,13 @@ import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.Paint;
 import android.graphics.YuvImage;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PowerManager;
 import android.media.AudioFormat;
 import android.media.MediaRecorder;
 import android.media.AudioRecord;
@@ -49,6 +51,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.MotionEvent;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.SurfaceView;
@@ -78,6 +81,7 @@ public class MainActivity extends Activity
     private TextView tvMessage1;
     private TextView tvMessage2;
     private int mQuality = 30;
+    private ViewGroup mBlackScreen;
 
     private AudioRecord audioCapture = null;
     private StreamingLoop audioLoop = null;
@@ -89,7 +93,7 @@ public class MainActivity extends Activity
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         Window win = getWindow();
         win.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);    
-        //win.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN); 
+        win.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN); 
 
         setContentView(R.layout.main);
 
@@ -103,6 +107,7 @@ public class MainActivity extends Activity
         btnExit.setOnClickListener(exitAction);
         tvMessage1 = (TextView)findViewById(R.id.tv_message1);
         tvMessage2 = (TextView)findViewById(R.id.tv_message2);
+        mBlackScreen = (ViewGroup) findViewById(R.id.black_screen);
         
         for(int i = 0; i < maxVideoNumber; i++) {
             videoFrames[i] = new VideoFrame(1024*1024*2);        
@@ -240,6 +245,7 @@ public class MainActivity extends Activity
                 webServer.registerCGI("/cgi/rotate", doRotate);
                 webServer.registerCGI("/cgi/autofocus", doAutoFocus);
                 webServer.registerCGI("/cgi/changequality", doChangeQuality);
+                webServer.registerCGI("/cgi/dimscreen", doDimScreen);
             }catch (IOException e){
                 webServer = null;
             }
@@ -456,6 +462,35 @@ public class MainActivity extends Activity
             return "ERROR";
         }   
  
+        @Override 
+        public InputStream streaming(Properties parms) {
+            return null;
+        }    
+    }; 
+
+    private TeaServer.CommonGatewayInterface doDimScreen = new TeaServer.CommonGatewayInterface () {
+        @Override
+        public String run(Properties parms) {
+            Log.d(TAG, ">>>>>>>run in doDimScreen");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    WindowManager.LayoutParams param = getWindow().getAttributes();
+                    param.screenBrightness = 0.01f;
+                    getWindow().setAttributes(param);
+                    
+                    mBlackScreen.setVisibility(View.VISIBLE);
+//                    if (mWakeLock == null) {
+//                        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+//                        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+//                    }
+//                    if (!mWakeLock.isHeld())
+//                        mWakeLock.acquire();
+                }
+            });
+            return "OK";
+        }   
+
         @Override 
         public InputStream streaming(Properties parms) {
             return null;

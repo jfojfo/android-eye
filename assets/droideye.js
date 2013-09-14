@@ -227,6 +227,7 @@ $(document).on("pageinit", "#page_main", function() {
     $("#rotate270").bind("click", function(){rotate(270);});
     $("#btn_autofocus").bind("click", autoFocus);
     $("#slider").on("slidestop", changeQuality);
+    $("#btn_dimscreen").bind("click", dimScreen);
     
     initAudioPlayer();
 
@@ -291,6 +292,17 @@ function changeQuality(e) {
         data: "quality=" + quality,
         success: function(){
             console.log("successfully changed quality to " + quality);
+        }
+    });
+}
+
+function dimScreen() {
+    $.ajax({
+        type: "GET",
+        url: basicURL + "cgi/dimscreen",
+        cache: false,
+        success: function(){
+            console.log("successfully dim screen");
         }
     });
 }

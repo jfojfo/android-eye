@@ -83,5 +83,11 @@
         </LinearLayout>
 
     </FrameLayout>    
-   
+
+    <LinearLayout android:id="@+id/black_screen"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#000"
+        android:visibility="gone" >
+    </LinearLayout>
 </FrameLayout>
