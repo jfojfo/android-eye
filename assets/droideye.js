@@ -107,7 +107,7 @@ var onQueryDone = function (json) {
     changeImageWH(currentSize.width, currentSize.height);
 
     var quality = jsonObj.quality;
-    changeQuality(quality);
+    $("#slider").val(quality).slider("refresh");
 };
 
 var onHttpError = function () {
